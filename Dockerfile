@@ -6,7 +6,6 @@ COPY requirements.txt ./
 RUN pip install -r requirements.txt -f https://download.pytorch.org/whl/torch_stable.html
 
 ENV PORT=3000
-ENV HOST=hoge
 ENV py_env=production
 
 COPY . ./
