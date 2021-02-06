@@ -4,6 +4,7 @@ from io import BytesIO
 from separater import Separater
 from youtube.main import YouTube
 import os
+from waitress import serve
 
 
 app = Flask(__name__, static_folder=None)
@@ -18,7 +19,10 @@ status = separater.load_model(
 @app.route('/', methods=['GET'])
 def help():
 
-    response = make_response('usage: curl -X POST http://prism.com/separate -F @path/to/audio/file.wav -o path/to/output.zip', 200)
+    response = make_response(
+        'usage: curl -X POST {} -F @path/to/audio/file.wav -o path/to/output.zip'.format(os.environ['HOST']),
+        200
+    )
     response.mimetype = "text/plain"
     return response
 
@@ -60,4 +64,7 @@ def separate_yt(id):
 
 
 if __name__ == "__main__":
-    app.run(debug=False, port=3000)
+    if os.environ['py_env'] == "production":
+        serve(app, host='0.0.0.0', port=os.environ['PORT'])
+    else:
+        app.run(debug=True, port=os.environ['PORT'])

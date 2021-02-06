@@ -14,6 +14,10 @@ tqdm = "*"
 flask-cors = "*"
 scipy = "*"
 youtube-dl = "*"
+waitress = "*"
 
 [requires]
 python_version = "3.9"
+
+[scripts]
+dev = "python api/main.py"
