@@ -27,12 +27,23 @@ def help():
     return response
 
 
+@app.route('/<id>/info', methods=['GET'])
+def info(id):
+
+    yt = YouTube()
+    info = yt.get_info(id)
+
+    if info is not None:
+        return jsonify(info)
+    else:
+        return jsonify({"msg": "no video found."}), 404
+
 
 @app.route('/separate', methods=['POST'])
 def separate():
 
     if separater.model is None:
-        return jsonify({"status": "error", "code": 500, "message": "some error occured."})
+        return jsonify({"msg": "some error occured."}), 500
 
     request_audio_buffer = BytesIO(request.files["file"].stream.read())
     source_zip_buffer = separater(buffer=request_audio_buffer)
@@ -45,11 +56,11 @@ def separate():
     return res
 
 
-@app.route('/separate/<id>', methods=['GET'])
+@app.route('/separate/<id>', methods=['POST'])
 def separate_yt(id):
 
     if separater.model is None:
-        return jsonify({"status": "error", "code": 500, "message": "some error occured."})
+        return jsonify({"msg": "some error occured."}), 500
 
     path = YouTube()(id)
     source_zip_buffer = separater(path=path)

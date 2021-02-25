@@ -18,21 +18,39 @@ class YouTube:
 
     def __init__(self):
         self.path = None
-        self.ydl_opts = {
+        self.info = None
+        self.ydl_download_opts = {
             'format': 'bestaudio/best',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'wav'
             }],
             'logger': MyLogger(),
-            'progress_hooks': [self.hook]
+            'progress_hooks': [self.download_hook]
+        }
+        self.ydl_info_opts = {
+            'skip_download': True,
+            'logger': MyLogger(),
+            'progress_hooks': [self.info_hook]
         }
 
-    def hook(self, d):
+    def get_info(self, id):
+        try:
+            with youtube_dl.YoutubeDL(self.ydl_info_opts) as ydl:
+                object = ydl.extract_info('https://www.youtube.com/watch?v={}'.format(str(id)), download=False)
+            return object
+        except youtube_dl.utils.DownloadError:
+            return None
+
+    def info_hook(self, d):
+        if d['status'] == 'finished':
+            self.info = d
+
+    def download_hook(self, d):
         if d['status'] == 'finished':
             self.path = os.path.splitext(os.path.abspath(d['filename']))[0]+'.wav'
 
     def __call__(self, id):
-        with youtube_dl.YoutubeDL(self.ydl_opts) as ydl:
+        with youtube_dl.YoutubeDL(self.ydl_download_opts) as ydl:
             ydl.download(['https://www.youtube.com/watch?v={}'.format(str(id))])
         return self.path

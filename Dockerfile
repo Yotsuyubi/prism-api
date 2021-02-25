@@ -9,6 +9,6 @@ ENV PORT=3000
 ENV py_env=production
 
 COPY . ./
-RUN cd api/models && wget https://github.com/Yotsuyubi/music-separater/releases/download/v1.0/model.th
+RUN cd api/models && wget -q https://github.com/Yotsuyubi/music-separater/releases/download/v1.0/model.th
 
 CMD ["python", "api/main.py"]
